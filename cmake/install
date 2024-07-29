@@ -133,7 +133,7 @@ mkdir -p "$source_dir" \
 
 # C6C265324BBEBDC350B513D02D2CEF1034921684: rsa4096 2010-02-16 Brad King <brad.king@kitware.com>
 key_ids=(C6C265324BBEBDC350B513D02D2CEF1034921684)
-key_servers=('keys.gnupg.net' 'pgp.key-server.io' 'keyserver.ubuntu.com')
+key_servers=('hkps://keyserver.ubuntu.com/', 'hkps://keys.mailvelope.com/', 'hkps://keys.openpgp.org/')
 for key_server in "${key_servers[@]}"; do
   timeout 30 gpg --homedir "$temp_dir/.gnupg" --batch --keyserver "$key_server" --recv-keys "${key_ids[@]}" && break
 done
