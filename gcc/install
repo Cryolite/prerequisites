@@ -146,7 +146,7 @@ key_ids=(B215C1633BCA0477615F1B35A5B3A004745C015A  \
          7F74F97C103468EE5D750B583AB00996FC26A641  \
          33C235A34C46AA3FFB293709A328C3A2C3C45C06  \
          D3A93CAD751C2AF4F8C7AD516C35B99309B5FA62)
-key_servers=('keys.gnupg.net' 'pgp.key-server.io' 'keyserver.ubuntu.com')
+key_servers=('keyserver.ubuntu.com', 'keys.mailvelope.com', 'keys.openpgp.org')
 for key_server in "${key_servers[@]}"; do
   timeout 30 gpg --homedir "$temp_dir/.gnupg" --batch --keyserver "$key_server" --recv-keys "${key_ids[@]}" && break
 done
