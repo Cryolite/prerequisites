@@ -9,7 +9,6 @@ common_sh_path="$(readlink -e "$script_dir/../prologue.sh")"
 unset common_sh_path
 
 PROGRAM_NAME=install
-URL_PREFIX='https://ftpmirror.gnu.org/gcc/'
 
 function print_usage ()
 {
@@ -17,6 +16,8 @@ function print_usage ()
 Usage: install [OPTION]...
 Install GCC.
 
+  --url-prefix=<URL>         The URL prefix to download GCC source archive
+                             (default: `https://ftpmirror.gnu.org/gcc/').
   --version=<VERSION>        The version of GCC to install (default: the
                              latest release version).
   --prefix=<PREFIX>          Pass `--prefix=<PREFIX>' on to GCC `configure'
@@ -32,13 +33,20 @@ EOF
 if getopt -T; (( $? != 4 )); then
   die_with_runtime_error "$PROGRAM_NAME" "\`getopt' is not an enhanced version."
 fi
-opts="$(getopt -n "$PROGRAM_NAME" -l version:,prefix:,source-dir:,clobber-source-dir,help -- h "$@")"
+opts="$(getopt -n "$PROGRAM_NAME" -l url-prefix:,version:,prefix:,source-dir:,clobber-source-dir,help -- h "$@")"
 eval set -- "$opts"
 
 while (( $# > 0 )); do
   arg="$1"
   shift
   case "$arg" in
+  --url-prefix)
+    if (( $# == 0 )); then
+      die_with_logic_error "$PROGRAM_NAME"
+    fi
+    url_prefix="$1"
+    shift
+    ;;
   --version)
     if (( $# == 0 )); then
       die_with_logic_error "$PROGRAM_NAME"
@@ -82,8 +90,12 @@ done
 
 configure_options=()
 
+if [[ ${url_prefix-NOT-DEFINED} == NOT-DEFINED ]]; then
+  url_prefix=https://ftpmirror.gnu.org/gcc/
+fi
+
 if [[ ${version-NOT-DEFINED} == NOT-DEFINED ]]; then
-  version="$(curl -fLsS "$URL_PREFIX"                                     \
+  version="$(curl -fLsS "$url_prefix"                                     \
                | grep -Eo 'gcc-[[:digit:]]+\.[[:digit:]]+\.[[:digit:]]+/' \
                | grep -Eo '[[:digit:]]+\.[[:digit:]]+\.[[:digit:]]+'      \
                | LANG=C.UTF-8 sort -Vu                                    \
@@ -151,9 +163,9 @@ for key_server in "${key_servers[@]}"; do
   timeout 30 gpg --homedir "$temp_dir/.gnupg" --batch --keyserver "$key_server" --recv-keys "${key_ids[@]}" && break
 done
 
-(cd "$temp_dir" && curl -fLsSo "gcc-$version.tar.xz" "${URL_PREFIX}gcc-$version/gcc-$version.tar.xz") \
+(cd "$temp_dir" && curl -fLsSo "gcc-$version.tar.xz" "${url_prefix}gcc-$version/gcc-$version.tar.xz") \
   || die_with_runtime_error "$PROGRAM_NAME" "Failed to download \`gcc-$version.tar.xz'."
-(cd "$temp_dir" && curl -fLsSo "gcc-$version.tar.xz.sig" "${URL_PREFIX}gcc-$version/gcc-$version.tar.xz.sig") \
+(cd "$temp_dir" && curl -fLsSo "gcc-$version.tar.xz.sig" "${url_prefix}gcc-$version/gcc-$version.tar.xz.sig") \
   || die_with_runtime_error "$PROGRAM_NAME" "Failed to download \`gcc-$version.tar.xz.sig'."
 gpg --homedir "$temp_dir/.gnupg" --batch --verify "$temp_dir/gcc-$version.tar.xz.sig" "$temp_dir/gcc-$version.tar.xz" \
   || die_with_runtime_error "$PROGRAM_NAME" "Failed to verify the signature in \`gcc-$version.tar.xz.sig'."
