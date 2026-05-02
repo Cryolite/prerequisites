@@ -70,17 +70,17 @@ while (( $# > 0 )); do
 done
 
 if [[ ${version-NOT-DEFINED} == NOT-DEFINED ]]; then
-  version="$(git ls-remote --tags 'https://github.com/boostorg/boost.git'             \
-               | grep -Eo 'refs/tags/boost-[[:digit:]]+\.[[:digit:]]+\.[[:digit:]]+$' \
-               | grep -Eo '[[:digit:]]+\.[[:digit:]]+\.[[:digit:]]+'                  \
-               | LANG=C.UTF-8 sort -Vu                                                \
-               | tail -n 1)"                                                          \
+  version="$(git ls-remote --tags 'https://github.com/boostorg/boost.git'                             \
+               | grep -Eo 'refs/tags/boost-[[:digit:]]+\.[[:digit:]]+\.[[:digit:]]+(-[[:digit:]]+)?$' \
+               | grep -Eo '[[:digit:]]+\.[[:digit:]]+\.[[:digit:]]+(-[[:digit:]]+)?'                  \
+               | LANG=C.UTF-8 sort -Vu                                                                \
+               | tail -n 1)"                                                                          \
     || die_with_runtime_error "$PROGRAM_NAME" "Failed to guess Boost latest release version."
-  if [[ ! $version =~ ^[[:digit:]]+\.[[:digit:]]+\.[[:digit:]]+$ ]]; then
+  if [[ ! $version =~ ^[[:digit:]]+\.[[:digit:]]+\.[[:digit:]]+(-[[:digit:]]+)?$ ]]; then
     die_with_runtime_error "$PROGRAM_NAME" "Failed to guess Boost latest release version."
   fi
 fi
-if [[ ! $version =~ ^[[:digit:]]+\.[[:digit:]]+\.[[:digit:]]+$ ]]; then
+if [[ ! $version =~ ^[[:digit:]]+\.[[:digit:]]+\.[[:digit:]]+(-[[:digit:]]+)?$ ]]; then
   die_with_user_error "$PROGRAM_NAME" "An invalid value \`$version' for \`--version' option."
 fi
 
