@@ -160,7 +160,7 @@ key_ids=(B215C1633BCA0477615F1B35A5B3A004745C015A  \
          D3A93CAD751C2AF4F8C7AD516C35B99309B5FA62)
 key_servers=('hkps://keyserver.ubuntu.com/', 'hkps://keys.mailvelope.com/', 'hkps://keys.openpgp.org/')
 for key_server in "${key_servers[@]}"; do
-  timeout 30 gpg --homedir "$temp_dir/.gnupg" --batch --keyserver "$key_server" --recv-keys "${key_ids[@]}" && break
+  gpg --homedir "$temp_dir/.gnupg" --batch --keyserver "$key_server" --recv-keys "${key_ids[@]}" && break
 done
 
 (cd "$temp_dir" && curl -fLsSo "gcc-$version.tar.xz" "${url_prefix}gcc-$version/gcc-$version.tar.xz") \
@@ -175,7 +175,7 @@ tar -xf "$temp_dir/gcc-$version.tar.xz" -C "$source_dir" --strip-components=1 \
   || die_with_runtime_error "$PROGRAM_NAME" "Failed to expand \`gcc-$version.tar.xz'."
 rm "$temp_dir/gcc-$version.tar.xz"
 
-(cd "$source_dir" && timeout 60 ./contrib/download_prerequisites) \
+(cd "$source_dir" && ./contrib/download_prerequisites) \
   || die_with_runtime_error "$PROGRAM_NAME" "Failed to download the prerequisites to build GCC."
 rm "$source_dir"/*.tar.*
 
