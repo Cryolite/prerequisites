@@ -183,9 +183,10 @@ build_dir="$temp_dir/build"
 mkdir "$build_dir"
 
 (cd "$build_dir" || exit $?
- "$source_dir/configure"                             \
-   --disable-multilib                                \
-   --enable-languages=c,c++                          \
+ "$source_dir/configure"                              \
+   --disable-multilib                                 \
+   --disable-bootstrap                                \
+   --enable-languages=c,c++                           \
    ${configure_options[@]+"${configure_options[@]}"}) \
   || die_with_runtime_error "$PROGRAM_NAME" "Failed to \`configure' GCC."
 
